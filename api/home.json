@@ -1,0 +1,11 @@
+{
+  "header":
+    "\"...my heart could not stop fluttering, and my body was alive, present in anticipation, fantastically real...\"",
+  "tabs": [
+    { "title": "home", "sub-header": "subheader for home", "content": "some content about home" },
+    { "title": "about", "sub-header": "subheader for about", "content": "some content about about" },
+    { "title": "music", "sub-header": "subheader for music", "content": "some content about muic" },
+    { "title": "poetry", "sub-header": "subheader for contact", "content": "some content about poetry" },
+    { "title": "contact", "sub-header": "subheader for contact", "content": "some content about contact" }
+  ]
+}

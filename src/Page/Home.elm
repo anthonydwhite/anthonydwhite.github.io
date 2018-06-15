@@ -1,8 +1,10 @@
 module Page.Home exposing (Model, Msg, init, update, view)
 
 import App
-import Data.Base as Base
+import Data.Home as Home
 import Data.Status as Status
+import Data.Tab exposing (Tab)
+import Dict exposing (Dict)
 import Html
 import Html.Attributes
 import Html.Events
@@ -17,7 +19,7 @@ import Route
 {-| -}
 type alias Model =
     { tab : Route.HomeTab
-    , base : Status.Status Http.Error Base.Base
+    , home : Status.Status Http.Error Home.Home
     }
 
 
@@ -32,8 +34,8 @@ init cached tab =
             ( model, Cmd.none )
 
         Nothing ->
-            ( { base = Status.loading, tab = tab }
-            , Http.send ReceiveData Base.request
+            ( { home = Status.loading, tab = tab }
+            , Http.send ReceiveData Home.request
             )
 
 
@@ -43,7 +45,7 @@ init cached tab =
 
 type Msg
     = SetLocation Route.Route
-    | ReceiveData (Result Http.Error Base.Base)
+    | ReceiveData (Result Http.Error Home.Home)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -52,11 +54,11 @@ update msg model =
         SetLocation route ->
             ( model, Route.navigate route )
 
-        ReceiveData (Ok base) ->
-            ( { model | base = Status.success base }, Cmd.none )
+        ReceiveData (Ok home) ->
+            ( { model | home = Status.success home }, Cmd.none )
 
         ReceiveData (Err err) ->
-            ( { model | base = Status.failure err }, Cmd.none )
+            ( { model | home = Status.failure err }, Cmd.none )
 
 
 
@@ -66,25 +68,30 @@ update msg model =
 view : Model -> Html.Html Msg
 view model =
     Html.div []
-        [ Html.text "Welcome"
+        [ Html.h1 [] [ Html.text "Anthony's Site" ]
         , Route.button SetLocation (Route.Blog Route.BlogTop) [] [ Html.text "Blog" ]
-        , viewBase model.base
+        , viewHome model.home
         ]
 
 
-viewBase : Status.Status Http.Error Base.Base -> Html.Html msg
-viewBase base =
-    case base of
+viewHome : Status.Status Http.Error Home.Home -> Html.Html msg
+viewHome home =
+    case home of
         Status.Loading _ ->
             Html.text "Loading..."
 
-        Status.Finished (Status.Success base) ->
-            Html.div [] (List.map viewMusic base.music)
+        Status.Finished (Status.Success home) ->
+            Html.div [] <| [ Html.h2 [] [ Html.text home.header ] ] ++ (viewTabs home.tabs)
 
         Status.Finished _ ->
-            Html.text "Could not load base!"
+            Html.text "Could not load home!"
 
 
-viewMusic : String -> Html.Html msg
-viewMusic music =
-    Html.div [] [ Html.text music ]
+viewTabs : List Tab -> List (Html.Html msg)
+viewTabs tabs =
+    List.map viewTab tabs
+
+
+viewTab : Tab -> Html.Html msg
+viewTab tab =
+    Html.div [] [ Html.h3 [] [ Html.text tab.title ], Html.h6 [] [ Html.text tab.subHeader ], Html.p [] [ Html.text tab.content ] ]

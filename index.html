@@ -10003,19 +10003,6 @@ var _anthonydwhite$anthonydwhite$App$application = function (config) {
 			subscriptions: _anthonydwhite$anthonydwhite$App$subscriptions(config)
 		});
 };
-var _anthonydwhite$anthonydwhite$Data_Base$Base = F2(
-	function (a, b) {
-		return {about: a, music: b};
-	});
-var _anthonydwhite$anthonydwhite$Data_Base$decoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_anthonydwhite$anthonydwhite$Data_Base$Base,
-	A2(_elm_lang$core$Json_Decode$field, 'about', _elm_lang$core$Json_Decode$string),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'music',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
-var _anthonydwhite$anthonydwhite$Data_Base$request = A2(_elm_lang$http$Http$get, '/source.json', _anthonydwhite$anthonydwhite$Data_Base$decoder);
 var _anthonydwhite$anthonydwhite$Data_Blog$init = function (entries) {
 	return {entries: entries};
 };
@@ -10030,6 +10017,29 @@ var _anthonydwhite$anthonydwhite$Data_Blog$request = A2(_elm_lang$http$Http$get,
 var _anthonydwhite$anthonydwhite$Data_Blog$Blog = function (a) {
 	return {entries: a};
 };
+var _anthonydwhite$anthonydwhite$Data_Tab$Tab = F3(
+	function (a, b, c) {
+		return {title: a, subHeader: b, content: c};
+	});
+var _anthonydwhite$anthonydwhite$Data_Tab$decoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_anthonydwhite$anthonydwhite$Data_Tab$Tab,
+	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'sub-header', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'content', _elm_lang$core$Json_Decode$string));
+var _anthonydwhite$anthonydwhite$Data_Home$Home = F2(
+	function (a, b) {
+		return {header: a, tabs: b};
+	});
+var _anthonydwhite$anthonydwhite$Data_Home$decoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_anthonydwhite$anthonydwhite$Data_Home$Home,
+	A2(_elm_lang$core$Json_Decode$field, 'header', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'tabs',
+		_elm_lang$core$Json_Decode$list(_anthonydwhite$anthonydwhite$Data_Tab$decoder)));
+var _anthonydwhite$anthonydwhite$Data_Home$request = A2(_elm_lang$http$Http$get, '/api/home.json', _anthonydwhite$anthonydwhite$Data_Home$decoder);
 var _anthonydwhite$anthonydwhite$Data_Status$data = function (status) {
 	var _p0 = status;
 	if (_p0.ctor === 'Loading') {
@@ -10289,48 +10299,95 @@ var _anthonydwhite$anthonydwhite$Route$parser = _evancz$url_parser$UrlParser$one
 			}
 		}
 	});
-var _anthonydwhite$anthonydwhite$Page_Home$viewMusic = function (music) {
+var _anthonydwhite$anthonydwhite$Page_Home$viewTab = function (tab) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(music),
-			_1: {ctor: '[]'}
+			_0: A2(
+				_elm_lang$html$Html$h3,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(tab.title),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h6,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(tab.subHeader),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(tab.content),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
 		});
 };
-var _anthonydwhite$anthonydwhite$Page_Home$viewBase = function (base) {
-	var _p0 = base;
+var _anthonydwhite$anthonydwhite$Page_Home$viewTabs = function (tabs) {
+	return A2(_elm_lang$core$List$map, _anthonydwhite$anthonydwhite$Page_Home$viewTab, tabs);
+};
+var _anthonydwhite$anthonydwhite$Page_Home$viewHome = function (home) {
+	var _p0 = home;
 	if (_p0.ctor === 'Loading') {
 		return _elm_lang$html$Html$text('Loading...');
 	} else {
 		if (_p0._0.ctor === 'Success') {
+			var _p1 = _p0._0._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(_elm_lang$core$List$map, _anthonydwhite$anthonydwhite$Page_Home$viewMusic, _p0._0._0.music));
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p1.header),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					_anthonydwhite$anthonydwhite$Page_Home$viewTabs(_p1.tabs)));
 		} else {
-			return _elm_lang$html$Html$text('Could not load base!');
+			return _elm_lang$html$Html$text('Could not load home!');
 		}
 	}
 };
 var _anthonydwhite$anthonydwhite$Page_Home$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		if (_p1.ctor === 'SetLocation') {
+		var _p2 = msg;
+		if (_p2.ctor === 'SetLocation') {
 			return {
 				ctor: '_Tuple2',
 				_0: model,
-				_1: _anthonydwhite$anthonydwhite$Route$navigate(_p1._0)
+				_1: _anthonydwhite$anthonydwhite$Route$navigate(_p2._0)
 			};
 		} else {
-			if (_p1._0.ctor === 'Ok') {
+			if (_p2._0.ctor === 'Ok') {
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							base: _anthonydwhite$anthonydwhite$Data_Status$success(_p1._0._0)
+							home: _anthonydwhite$anthonydwhite$Data_Status$success(_p2._0._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -10340,7 +10397,7 @@ var _anthonydwhite$anthonydwhite$Page_Home$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							base: _anthonydwhite$anthonydwhite$Data_Status$failure(_p1._0._0)
+							home: _anthonydwhite$anthonydwhite$Data_Status$failure(_p2._0._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -10349,21 +10406,21 @@ var _anthonydwhite$anthonydwhite$Page_Home$update = F2(
 	});
 var _anthonydwhite$anthonydwhite$Page_Home$Model = F2(
 	function (a, b) {
-		return {tab: a, base: b};
+		return {tab: a, home: b};
 	});
 var _anthonydwhite$anthonydwhite$Page_Home$ReceiveData = function (a) {
 	return {ctor: 'ReceiveData', _0: a};
 };
 var _anthonydwhite$anthonydwhite$Page_Home$init = F2(
 	function (cached, tab) {
-		var _p2 = cached;
-		if (_p2.ctor === 'Just') {
-			return {ctor: '_Tuple2', _0: _p2._0, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p3 = cached;
+		if (_p3.ctor === 'Just') {
+			return {ctor: '_Tuple2', _0: _p3._0, _1: _elm_lang$core$Platform_Cmd$none};
 		} else {
 			return {
 				ctor: '_Tuple2',
-				_0: {base: _anthonydwhite$anthonydwhite$Data_Status$loading, tab: tab},
-				_1: A2(_elm_lang$http$Http$send, _anthonydwhite$anthonydwhite$Page_Home$ReceiveData, _anthonydwhite$anthonydwhite$Data_Base$request)
+				_0: {home: _anthonydwhite$anthonydwhite$Data_Status$loading, tab: tab},
+				_1: A2(_elm_lang$http$Http$send, _anthonydwhite$anthonydwhite$Page_Home$ReceiveData, _anthonydwhite$anthonydwhite$Data_Home$request)
 			};
 		}
 	});
@@ -10376,7 +10433,14 @@ var _anthonydwhite$anthonydwhite$Page_Home$view = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('Welcome'),
+			_0: A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Anthony\'s Site'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A4(
@@ -10391,7 +10455,7 @@ var _anthonydwhite$anthonydwhite$Page_Home$view = function (model) {
 					}),
 				_1: {
 					ctor: '::',
-					_0: _anthonydwhite$anthonydwhite$Page_Home$viewBase(model.base),
+					_0: _anthonydwhite$anthonydwhite$Page_Home$viewHome(model.home),
 					_1: {ctor: '[]'}
 				}
 			}
