@@ -1,8 +1,6 @@
 module Page.NotFound exposing (Model, Msg, init, update, view)
 
-import App
-import Html
-import Html.Events
+import Html.Styled exposing (..)
 import Navigation
 import Route
 
@@ -45,10 +43,10 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
+view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.text "NOT FOUND"
-        , Html.div [] [ Html.text <| "Could not find path: " ++ model.location.pathname ]
-        , Route.link SetLocation (Route.Home Route.HomeTop) [] [ Html.text "Home" ]
+    div []
+        [ text "NOT FOUND"
+        , div [] [ text <| "Could not find path: " ++ model.location.pathname ]
+        , Route.link SetLocation (Route.Home Route.HomeTop) [] [ text "Home" ]
         ]

@@ -1,18 +1,22 @@
 module Page.Blog exposing (Model, Msg, init, update, view)
 
-import App
+-- import App
+
 import Data.Status as Status
 import Data.Blog as Blog
-import Dict
-import Html
-import Html.Attributes
-import Html.Events
+import Html.Styled exposing (..)
+
+
+-- import Html.Styled.Attributes exposing (..)
+-- import Html.Styled.Events exposing (..)
+
 import Http
 import Navigation
 import Route
-import UrlParser as P exposing ((</>))
+import Styles
 
 
+-- import UrlParser as P exposing ((</>))
 -- MODEL
 
 
@@ -69,28 +73,40 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
+view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.text "Blog"
-        , Route.button SetLocation (Route.Home Route.HomeTop) [] [ Html.text "Home" ]
-        , Html.div [] [ viewEntries model.entries ]
+    div []
+        [ Styles.home
+        , div [ Styles.container ]
+            [ h1 [] [ text "Blog" ]
+            , viewNavBar
+            , div [] [ viewEntries model.entries ]
+            ]
         ]
 
 
-viewEntries : Status.Status Http.Error (List Blog.Entry) -> Html.Html Msg
+viewNavBar : Html Msg
+viewNavBar =
+    header [ Styles.navbar ]
+        [ section [ Styles.navbarSection ]
+            [ Route.button SetLocation (Route.Home Route.HomeTop) [ Styles.btn, Styles.btnLink ] [ text "Home" ]
+            ]
+        ]
+
+
+viewEntries : Status.Status Http.Error (List Blog.Entry) -> Html Msg
 viewEntries entries =
     case entries of
         Status.Loading _ ->
-            Html.text "Loading..."
+            text "Loading..."
 
         Status.Finished (Status.Success entries) ->
-            Html.div [] <| List.map viewEntry entries
+            div [] <| List.map viewEntry entries
 
         Status.Finished _ ->
-            Html.text "Could not load blog!"
+            text "Could not load blog!"
 
 
-viewEntry : Blog.Entry -> Html.Html Msg
+viewEntry : Blog.Entry -> Html Msg
 viewEntry entry =
-    Html.div [] [ Html.text entry.title, Html.text entry.content ]
+    div [] [ h3 [] [ text entry.title ], p [] [ text entry.content ] ]

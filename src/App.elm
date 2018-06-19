@@ -14,9 +14,10 @@ module App exposing (Application, Config, application, button, link)
 
 -}
 
-import Html exposing (Html)
-import Html.Attributes
-import Html.Events
+import Html
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (target, href)
+import Html.Styled.Events exposing (onWithOptions)
 import Json.Decode as Json
 import Navigation exposing (Location)
 import UrlParser as Parser exposing (Parser)
@@ -51,7 +52,7 @@ type alias Config app route page msg =
     , load : Result Location route -> app -> ( page, Cmd msg )
     , save : page -> app -> app
     , update : msg -> page -> ( page, Cmd msg )
-    , view : page -> Html msg
+    , view : page -> Html.Styled.Html msg
     , subscriptions : page -> Sub msg
     }
 
@@ -62,7 +63,7 @@ application : Config app route page msg -> Application app route page msg
 application config =
     Navigation.program ReceiveLocation
         { init = init config config.init
-        , view = view config
+        , view = (view config) >> toUnstyled
         , update = update config
         , subscriptions = subscriptions config
         }
@@ -102,19 +103,19 @@ reinit config app route location =
                 rewritten =
                     config.composer route_
             in
-            if rewritten == location.pathname then
-                Cmd.none
-            else
-                Navigation.modifyUrl rewritten
+                if rewritten == location.pathname then
+                    Cmd.none
+                else
+                    Navigation.modifyUrl rewritten
 
         routeResult =
             route
                 |> Maybe.map Ok
                 |> Maybe.withDefault (Err location)
     in
-    config.load routeResult app
-        |> Tuple.mapFirst (Model route app)
-        |> Tuple.mapSecond (\cmd -> Cmd.batch [ Cmd.map PageMsg cmd, redirectCmd ])
+        config.load routeResult app
+            |> Tuple.mapFirst (Model route app)
+            |> Tuple.mapSecond (\cmd -> Cmd.batch [ Cmd.map PageMsg cmd, redirectCmd ])
 
 
 
@@ -134,10 +135,10 @@ update config msg model =
                 route =
                     Parser.parsePath config.parser location
             in
-            if route == model.route then
-                ( model, Cmd.none )
-            else
-                reinit config (config.save model.page model.app) route location
+                if route == model.route then
+                    ( model, Cmd.none )
+                else
+                    reinit config (config.save model.page model.app) route location
 
         PageMsg msg ->
             config.update msg model.page
@@ -149,10 +150,10 @@ update config msg model =
 -- APPLICATION / INTERNAL / VIEW
 
 
-view : Config app route page msg -> Model route app page -> Html.Html (Msg route msg)
+view : Config app route page msg -> Model route app page -> Html.Styled.Html (Msg route msg)
 view config model =
     config.view model.page
-        |> Html.map PageMsg
+        |> Html.Styled.map PageMsg
 
 
 
@@ -171,28 +172,28 @@ subscriptions config model =
 
 {-| A link which prevents default.
 -}
-link : (route -> String) -> (route -> msg) -> route -> List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
+link : (route -> String) -> (route -> msg) -> route -> List (Html.Styled.Attribute msg) -> List (Html.Styled.Html msg) -> Html.Styled.Html msg
 link toString toMsg nextRoute attributes =
-    Html.a (linkAttributes toString toMsg nextRoute attributes)
+    a (linkAttributes toString toMsg nextRoute attributes)
 
 
 {-| A button link which prevents default.
 -}
-button : (route -> String) -> (route -> msg) -> route -> List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
+button : (route -> String) -> (route -> msg) -> route -> List (Html.Styled.Attribute msg) -> List (Html.Styled.Html msg) -> Html.Styled.Html msg
 button toString toMsg nextRoute attributes =
-    Html.button (linkAttributes toString toMsg nextRoute attributes)
+    Html.Styled.button (linkAttributes toString toMsg nextRoute attributes)
 
 
-linkAttributes : (route -> String) -> (route -> msg) -> route -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+linkAttributes : (route -> String) -> (route -> msg) -> route -> List (Html.Styled.Attribute msg) -> List (Html.Styled.Attribute msg)
 linkAttributes toString onSuccess nextRoute attributes =
     attributes
         ++ [ onClick (onSuccess nextRoute)
-           , Html.Attributes.target "_blank"
-           , Html.Attributes.href (toString nextRoute)
+           , target "_blank"
+           , href (toString nextRoute)
            ]
 
 
-onClick : msg -> Html.Attribute msg
+onClick : msg -> Html.Styled.Attribute msg
 onClick successMsg =
     let
         -- TODO what is this all about
@@ -210,4 +211,4 @@ onClick successMsg =
         decoder =
             Json.andThen finish isCtrlOrMeta
     in
-    Html.Events.onWithOptions "click" { stopPropagation = False, preventDefault = True } decoder
+        onWithOptions "click" { stopPropagation = False, preventDefault = True } decoder

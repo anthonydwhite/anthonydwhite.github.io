@@ -5,11 +5,19 @@ import Data.Home as Home
 import Data.Status as Status
 import Data.Tab exposing (Tab)
 import Dict exposing (Dict)
-import Html
-import Html.Attributes
-import Html.Events
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (class, href, rel)
+import Styles
+
+
+-- import Html.Styled.Attributes
+-- import Html.Styled.Events
+
 import Http
-import Navigation
+
+
+-- import Navigation
+
 import Route
 
 
@@ -65,33 +73,48 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
+view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.h1 [] [ Html.text "Anthony's Site" ]
-        , Route.button SetLocation (Route.Blog Route.BlogTop) [] [ Html.text "Blog" ]
-        , viewHome model.home
+    div []
+        [ Styles.home
+        , div [ Styles.container ]
+            [ h1 [] [ text "Anthony's Site" ]
+            , viewNavBar
+            , div [] [ viewHome model.home ]
+            ]
         ]
 
 
-viewHome : Status.Status Http.Error Home.Home -> Html.Html msg
+viewNavBar : Html Msg
+viewNavBar =
+    header [ Styles.navbar ]
+        [ section [ Styles.navbarSection ]
+            [ Route.button SetLocation (Route.Blog Route.BlogTop) [ Styles.btn, Styles.btnLink ] [ text "Blog" ]
+            ]
+        ]
+
+
+viewHome : Status.Status Http.Error Home.Home -> Html msg
 viewHome home =
     case home of
         Status.Loading _ ->
-            Html.text "Loading..."
+            text "Loading..."
 
         Status.Finished (Status.Success home) ->
-            Html.div [] <| [ Html.h2 [] [ Html.text home.header ] ] ++ (viewTabs home.tabs)
+            div []
+                [ h2 [] [ text home.header ]
+                , div [] (viewTabs home.tabs)
+                ]
 
         Status.Finished _ ->
-            Html.text "Could not load home!"
+            text "Could not load home!"
 
 
-viewTabs : List Tab -> List (Html.Html msg)
+viewTabs : List Tab -> List (Html msg)
 viewTabs tabs =
     List.map viewTab tabs
 
 
-viewTab : Tab -> Html.Html msg
+viewTab : Tab -> Html msg
 viewTab tab =
-    Html.div [] [ Html.h3 [] [ Html.text tab.title ], Html.h6 [] [ Html.text tab.subHeader ], Html.p [] [ Html.text tab.content ] ]
+    div [] [ h3 [] [ text tab.title ], h4 [] [ text tab.subHeader ], p [] [ text tab.content ] ]

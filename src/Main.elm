@@ -1,8 +1,7 @@
 module Main exposing (main)
 
 import App
-import Dict
-import Html
+import Html.Styled as Styled
 import Navigation
 import Page.Home as Home
 import Page.NotFound as NotFound
@@ -107,14 +106,14 @@ update msg page =
             ( page, Cmd.none )
 
 
-view : Page -> Html.Html Msg
+view : Page -> Styled.Html Msg
 view page =
     case page of
         Blog model ->
-            Html.map BlogMsg (Blog.view model)
+            Styled.map BlogMsg (Blog.view model)
 
         Home model ->
-            Html.map HomeMsg (Home.view model)
+            Styled.map HomeMsg (Home.view model)
 
         NotFound model ->
-            Html.map NotFoundMsg (NotFound.view model)
+            Styled.map NotFoundMsg (NotFound.view model)
