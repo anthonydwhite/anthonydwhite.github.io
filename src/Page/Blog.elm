@@ -19,7 +19,7 @@ import UrlParser as P exposing ((</>))
 {-| -}
 type alias Model =
     { tab : Route.BlogTab
-    , entries : Status.Status Http.Error (List String)
+    , entries : Status.Status Http.Error (List Blog.Entry)
     }
 
 
@@ -78,7 +78,7 @@ view model =
         ]
 
 
-viewEntries : Status.Status Http.Error (List String) -> Html.Html Msg
+viewEntries : Status.Status Http.Error (List Blog.Entry) -> Html.Html Msg
 viewEntries entries =
     case entries of
         Status.Loading _ ->
@@ -91,6 +91,6 @@ viewEntries entries =
             Html.text "Could not load blog!"
 
 
-viewEntry : String -> Html.Html Msg
+viewEntry : Blog.Entry -> Html.Html Msg
 viewEntry entry =
-    Html.div [] [ Html.text entry ]
+    Html.div [] [ Html.text entry.title, Html.text entry.content ]

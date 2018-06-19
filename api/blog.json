@@ -1,3 +1,3 @@
 {
-  "entries": ["My first entry"]
+  "entries": [{ "title": "My first entry", "content": "something" }]
 }

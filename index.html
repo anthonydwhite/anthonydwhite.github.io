@@ -10006,14 +10006,23 @@ var _anthonydwhite$anthonydwhite$App$application = function (config) {
 var _anthonydwhite$anthonydwhite$Data_Blog$init = function (entries) {
 	return {entries: entries};
 };
+var _anthonydwhite$anthonydwhite$Data_Blog$Entry = F2(
+	function (a, b) {
+		return {title: a, content: b};
+	});
+var _anthonydwhite$anthonydwhite$Data_Blog$entryDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_anthonydwhite$anthonydwhite$Data_Blog$Entry,
+	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'content', _elm_lang$core$Json_Decode$string));
 var _anthonydwhite$anthonydwhite$Data_Blog$decoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	_anthonydwhite$anthonydwhite$Data_Blog$init,
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'entries',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
-var _anthonydwhite$anthonydwhite$Data_Blog$request = A2(_elm_lang$http$Http$get, '/blog.json', _anthonydwhite$anthonydwhite$Data_Blog$decoder);
+		_elm_lang$core$Json_Decode$list(_anthonydwhite$anthonydwhite$Data_Blog$entryDecoder)));
+var _anthonydwhite$anthonydwhite$Data_Blog$request = A2(_elm_lang$http$Http$get, '/api/blog.json', _anthonydwhite$anthonydwhite$Data_Blog$decoder);
 var _anthonydwhite$anthonydwhite$Data_Blog$Blog = function (a) {
 	return {entries: a};
 };
@@ -10525,8 +10534,12 @@ var _anthonydwhite$anthonydwhite$Page_Blog$viewEntry = function (entry) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(entry),
-			_1: {ctor: '[]'}
+			_0: _elm_lang$html$Html$text(entry.title),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(entry.content),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _anthonydwhite$anthonydwhite$Page_Blog$viewEntries = function (entries) {
